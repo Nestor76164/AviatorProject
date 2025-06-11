@@ -148,6 +148,16 @@
     const tbody = document.getElementById('data-body');
 
 const sound = document.getElementById('notif-sound');
+// 🔓 Débloquer l'audio après une première interaction utilisateur
+document.addEventListener('click', () => {
+  sound.play().then(() => {
+    sound.pause(); // on le joue et le stoppe immédiatement
+    sound.currentTime = 0;
+  }).catch(() => {
+    // Silencieusement ignorer si rejeté
+  });
+}, { once: true });
+
 let lastKeys = [];
 
 
