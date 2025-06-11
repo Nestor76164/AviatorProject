@@ -85,6 +85,17 @@
       width: 100%;
       table-layout: fixed;
     }
+
+    @keyframes highlight {
+  0%   { background-color: #d1ffd1; }
+  50%  { background-color: #b0ffb0; }
+  100% { background-color: transparent; }
+}
+
+.new-row {
+  animation: highlight 1.2s ease-in-out;
+}
+
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -98,6 +109,12 @@
     <div id="box" class="box">21.0X</div>
     <button id="predictBtn" onclick="changerCouleur()">Prédire</button>
   </div>
+
+  <!-- 🔈 Son discret -->
+<audio id="notif-sound" preload="auto">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-light-beep-1121.mp3" type="audio/mpeg">
+</audio>
+
 
   <table>
     <thead>
@@ -130,23 +147,38 @@
     const dataRef = ref(db, 'PrepProject');
     const tbody = document.getElementById('data-body');
 
-    onValue(dataRef, (snapshot) => {
-      const data = snapshot.val();
-      tbody.innerHTML = "";
+const sound = document.getElementById('notif-sound');
+let lastKeys = [];
 
-      if (data) {
-        const entries = Object.values(data).sort((a, b) => b.timestamp - a.timestamp);
 
-        entries.forEach(entry => {
-          const row = document.createElement('tr');
-          const date = new Date(entry.timestamp * 1000).toLocaleString();
-          const valeur = entry.valeur ?? entry.texte ?? "-";
 
-          row.innerHTML = `<td>${date}</td><td>${valeur}</td>`;
-          tbody.appendChild(row);
-        });
+onValue(dataRef, (snapshot) => {
+  const data = snapshot.val();
+  tbody.innerHTML = "";
+
+  if (data) {
+    const entries = Object.entries(data).sort((a, b) => b[1].timestamp - a[1].timestamp);
+    const newKeys = entries.map(entry => entry[0]);
+    const isNew = lastKeys.length && newKeys[0] !== lastKeys[0];
+
+    entries.forEach(([key, entry]) => {
+      const row = document.createElement('tr');
+      const date = new Date(entry.timestamp * 1000).toLocaleString();
+      const valeur = entry.valeur ?? entry.texte ?? "-";
+
+      row.innerHTML = `<td>${date}</td><td>${valeur}</td>`;
+      if (key === newKeys[0] && isNew) {
+        row.classList.add("new-row");  // animation si tu en as une
+        sound.play();                  // 🔈 joue le son
       }
+
+      tbody.appendChild(row);
     });
+
+    lastKeys = newKeys;
+  }
+});
+
 
     // 🎨 Changer la couleur du bouton
     window.changerCouleur = function () {
