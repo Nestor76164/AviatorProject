@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tableau des valeurs Firebase</title>
+  <title>Tableau des valeurs Aviator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -96,6 +96,212 @@
   animation: highlight 1.2s ease-in-out;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  max-width: 400px;
+}
+
+.modal-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn.cancel {
+  background-color: #999;
+  color: white;
+}
+
+.btn.delete {
+  background-color: #d11a2a;
+  color: white;
+}
+
+.hidden {
+  display: none;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 90%;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-header {
+  background-color: #ffcc00;
+  color: #222;
+  padding: 15px;
+  font-size: 18px;
+  font-weight: bold;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-body {
+  padding: 20px;
+  font-size: 16px;
+  color: #333;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 15px 20px;
+  border-top: 1px solid #eee;
+}
+
+.btn {
+  padding: 10px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.btn.cancel {
+  background-color: #bbb;
+  color: white;
+}
+
+.btn.cancel:hover {
+  background-color: #999;
+}
+
+.btn.delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn.delete:hover {
+  background-color: #c0392b;
+}
+
+.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: #28a745;
+  color: white;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  font-size: 16px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10000;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.toast.error {
+  background-color: #e74c3c;
+}
+
+.center-toast-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.center-toast-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.center-toast {
+  background-color: #28a745;
+  color: white;
+  padding: 20px 30px;
+  font-size: 18px;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  animation: scaleIn 0.3s ease;
+}
+
+.center-toast.error {
+  background-color: #e74c3c;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
@@ -103,17 +309,48 @@
 </head>
 <body>
 
-  <h1>📊 Données détectées (Firebase)</h1>
+  <h1>📊 Données détectées (Aviator)</h1>
 
   <div class="top-bar">
     <div id="box" class="box">21.0X</div>
     <button id="predictBtn" onclick="changerCouleur()">Prédire</button>
+
+    <button style="background-color: red; margin-top: 10px;" onclick="openModal()">🗑️ Supprimer les données</button>
+
+<!-- ✅ Toast centré avec overlay -->
+<div id="centerToastOverlay" class="center-toast-overlay">
+  <div id="centerToast" class="center-toast">✅ Données supprimées avec succès !</div>
+</div>
+
+
+
+
   </div>
 
   <!-- 🔈 Son discret -->
 <audio id="notif-sound" preload="auto">
   <source src="https://assets.mixkit.co/sfx/preview/mixkit-light-beep-1121.mp3" type="audio/mpeg">
 </audio>
+
+
+
+<!-- 💬 Confirmation stylisée -->
+<div id="confirmModal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-header">
+      ⚠️ Confirmation de suppression
+    </div>
+    <div class="modal-body">
+      <p>Es-tu sûr de vouloir <strong>supprimer toutes les données</strong> ?</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn delete" onclick="deleteData()">Oui, supprimer</button>
+    </div>
+  </div>
+</div>
+
+
 
 
   <table>
@@ -195,6 +432,56 @@ onValue(dataRef, (snapshot) => {
       const button = document.getElementById("predictBtn");
       button.classList.toggle("active");
     }
+
+
+
+
+
+// 🔄 Boîte modale personnalisée
+window.openModal = function () {
+  document.getElementById("confirmModal").classList.remove("hidden");
+}
+
+window.closeModal = function () {
+  document.getElementById("confirmModal").classList.add("hidden");
+}
+
+// ✅ Affiche une notification toast stylisée
+function showToast(message, isError = false) {
+  const overlay = document.getElementById("centerToastOverlay");
+  const toast = document.getElementById("centerToast");
+
+  toast.textContent = message;
+
+  if (isError) {
+    toast.classList.add("error");
+  } else {
+    toast.classList.remove("error");
+  }
+
+  overlay.classList.add("show");
+
+  // Masquer après 3 secondes
+  setTimeout(() => {
+    overlay.classList.remove("show");
+  }, 2000);
+}
+
+// 🗑️ Suppression des données dans Firebase
+window.deleteData = function () {
+  closeModal(); // Fermer la modale
+  import("https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js").then(({ getDatabase, ref, remove }) => {
+    const db = getDatabase();
+    const dataRef = ref(db, "PrepProject");
+    remove(dataRef).then(() => {
+      showToast("✅ Données supprimées avec succès !");
+    }).catch((error) => {
+      showToast("❌ Erreur : " + error.message, true);
+    });
+  });
+}
+
+
   </script>
 </body>
 </html>
